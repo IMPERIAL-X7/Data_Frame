@@ -1,0 +1,21 @@
+# Build directories
+build/
+bin/
+lib/
+
+# OS specific files
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# Data and large files
+*.csv
+*.parquet
+*.tar
+*.png
+
+# Build artifacts
+*.o
+*.out
