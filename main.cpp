@@ -60,9 +60,7 @@ int main() {
         lazy_plan.explain("plan.png");
 
         std::cout << "\n=== 8. Testing INNER JOIN ===" << std::endl;
-        
         // 1. Our left table is the 'df' we loaded earlier (has 'dept' column)
-        
         // 2. Let's create a quick right table using EagerDataFrame's CSV reader manually
         std::ofstream dept_file("dept_data.csv");
         dept_file << "dept,manager\n";
@@ -78,6 +76,19 @@ int main() {
         auto joined_df = df.join(dept_df, "dept", "inner");
         std::cout << "Joined Table:" << std::endl;
         joined_df.print();
+
+        std::cout << "\n=== 9. Testing GroupBy & Aggregate ===" << std::endl;
+        // Group by department, calculate the mean salary and count of employees
+        auto grouped_df = df.group_by({"dept"})
+                            .aggregate({
+                                {"salary", "mean"},
+                                {"id", "count"}
+                            });
+                            
+        std::cout << "Aggregated Table:" << std::endl;
+        grouped_df.print();
+        
+        std::cout << "\nAll Core DataFrameLib systems are online!" << std::endl;
 
         std::cout << "All basic Eager operations passed successfully!" << std::endl;
 

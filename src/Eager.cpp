@@ -6,9 +6,7 @@
 #include <arrow/acero/options.h>
 #include <iostream>
 
-// ---------------------------------------------------------
 // Core Operations
-// ---------------------------------------------------------
 
 EagerDataFrame EagerDataFrame::select(const std::vector<std::string>& columns) const {
     std::vector<int> indices;
@@ -132,6 +130,54 @@ EagerDataFrame EagerDataFrame::join(const EagerDataFrame& other, const std::stri
     return EagerDataFrame(*result_table);
 }
 
+// GroupedDataFrame Implementation
+EagerDataFrame GroupedDataFrame::aggregate(const std::unordered_map<std::string, std::string>& agg_map) const {
+    // 1. Prepare the grouping keys
+    std::vector<arrow::FieldRef> keys;
+    for (const auto& key : keys_) {
+        keys.emplace_back(key);
+    }
+
+    // 2. Prepare the aggregations
+    std::vector<arrow::compute::Aggregate> aggregates;
+    for (const auto& [col_name, func_name] : agg_map) {
+        std::string arrow_func;
+        
+        // Map user functions to Arrow's internal hash aggregation functions
+        if (func_name == "sum") arrow_func = "hash_sum";
+        else if (func_name == "mean") arrow_func = "hash_mean";
+        else if (func_name == "count") arrow_func = "hash_count";
+        else if (func_name == "min") arrow_func = "hash_min";
+        else if (func_name == "max") arrow_func = "hash_max";
+        else throw std::runtime_error("Unsupported aggregation function: " + func_name);
+
+        // Name the output column exactly as required by the assignment or logically
+        std::string output_col_name = col_name + "_" + func_name;
+        
+        // Note: nullptr means we use default function options
+        aggregates.push_back(arrow::compute::Aggregate{arrow_func, nullptr, col_name, output_col_name});
+    }
+
+    // 3. Set up the Acero Options
+    arrow::acero::AggregateNodeOptions agg_options(aggregates, keys);
+
+    // 4. Build the Execution Graph
+    auto source_decl = arrow::acero::Declaration{
+        "table_source", arrow::acero::TableSourceNodeOptions(table_)
+    };
+    
+    auto agg_decl = arrow::acero::Declaration{
+        "aggregate", {source_decl}, agg_options
+    };
+
+    // 5. Execute and collect
+    auto result_table = arrow::acero::DeclarationToTable(agg_decl);
+    if (!result_table.ok()) {
+        throw std::runtime_error("Aggregation failed: " + result_table.status().ToString());
+    }
+
+    return EagerDataFrame(*result_table);
+}
 
 // ---------------------------------------------------------
 // Debugging Utility
