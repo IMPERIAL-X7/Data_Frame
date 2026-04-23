@@ -10,11 +10,15 @@ list(APPEND CMAKE_PREFIX_PATH "$ENV{HOME}/anaconda3")
 # Find Apache Arrow
 find_package(Arrow REQUIRED)
 find_package(Parquet REQUIRED)
-# Find Graphviz/Boost for DAG rendering
-# find_package(Graphviz REQUIRED) 
+find_package(ArrowDataset REQUIRED)
 
 # Include directories
 include_directories(include)
+
+# Find Graphviz/Boost for DAG rendering
+# Not required for compilation as we use the 'dot' CLI tool directly
+# find_package(Graphviz)
+# find_package(Boost)
 
 # Your core library
 add_library(DataFrameLib 
@@ -26,8 +30,16 @@ add_library(DataFrameLib
 )
 
 # Link Arrow to your library
-target_link_libraries(DataFrameLib PUBLIC Arrow::arrow_shared Parquet::parquet_shared)
+target_link_libraries(DataFrameLib PUBLIC
+    Arrow::arrow_shared
+    ArrowDataset::arrow_dataset_shared
+    Parquet::parquet_shared
+)
 
 # Add main executable
 add_executable(main main.cpp)
 target_link_libraries(main PRIVATE DataFrameLib)
+
+# Force the compiled binary to prioritize the system's C++ standard library 
+# over Anaconda's outdated libstdc++.so.6 at runtime.
+target_link_options(main PRIVATE "-Wl,-rpath=/usr/lib/x86_64-linux-gnu")

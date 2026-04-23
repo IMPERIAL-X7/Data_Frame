@@ -2,6 +2,8 @@
 #include <arrow/compute/api.h>
 #include <arrow/array/util.h>
 #include <arrow/pretty_print.h>
+#include <arrow/acero/exec_plan.h>
+#include <arrow/acero/options.h>
 #include <iostream>
 
 // ---------------------------------------------------------
@@ -88,6 +90,48 @@ EagerDataFrame EagerDataFrame::head(int64_t n) const {
     if (n >= table_->num_rows()) return *this; 
     return EagerDataFrame(table_->Slice(0, n));
 }
+
+EagerDataFrame EagerDataFrame::join(const EagerDataFrame& other, const std::string& on, const std::string& how) const {
+    // 1. Map your string "how" to Arrow's JoinType enum
+    arrow::acero::JoinType join_type;
+    if (how == "inner") join_type = arrow::acero::JoinType::INNER;
+    else if (how == "left") join_type = arrow::acero::JoinType::LEFT_OUTER;
+    else if (how == "right") join_type = arrow::acero::JoinType::RIGHT_OUTER;
+    else if (how == "outer") join_type = arrow::acero::JoinType::FULL_OUTER;
+    else throw std::runtime_error("Unsupported join type: " + how);
+
+    // 2. Set up the Join Options (joining on the specified column)
+    arrow::acero::HashJoinNodeOptions join_options{
+        join_type,
+        /*left_keys=*/{arrow::FieldRef(on)},
+        /*right_keys=*/{arrow::FieldRef(on)}
+    };
+
+    // 3. Declare the Acero Execution Graph
+    // Node 1: The Left Table (this)
+    auto left_src = arrow::acero::Declaration{
+        "table_source", arrow::acero::TableSourceNodeOptions(table_)
+    };
+    
+    // Node 2: The Right Table (other)
+    auto right_src = arrow::acero::Declaration{
+        "table_source", arrow::acero::TableSourceNodeOptions(other.get_table())
+    };
+
+    // Node 3: The Hash Join (takes left and right as inputs)
+    auto join_decl = arrow::acero::Declaration{
+        "hashjoin", {left_src, right_src}, join_options
+    };
+
+    // 4. Execute the graph and collect the result into a new Table
+    auto result_table = arrow::acero::DeclarationToTable(join_decl);
+    if (!result_table.ok()) {
+        throw std::runtime_error("Join failed: " + result_table.status().ToString());
+    }
+
+    return EagerDataFrame(*result_table);
+}
+
 
 // ---------------------------------------------------------
 // Debugging Utility

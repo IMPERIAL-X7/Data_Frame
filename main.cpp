@@ -59,6 +59,26 @@ int main() {
         // This should output a 'plan.png' file in your build directory
         lazy_plan.explain("plan.png");
 
+        std::cout << "\n=== 8. Testing INNER JOIN ===" << std::endl;
+        
+        // 1. Our left table is the 'df' we loaded earlier (has 'dept' column)
+        
+        // 2. Let's create a quick right table using EagerDataFrame's CSV reader manually
+        std::ofstream dept_file("dept_data.csv");
+        dept_file << "dept,manager\n";
+        dept_file << "Engineering,Grace Hopper\n";
+        dept_file << "Sales,Jordan Belfort\n";
+        dept_file.close();
+        
+        auto dept_df = EagerDataFrame::read_csv("dept_data.csv");
+        std::cout << "Right Table (Departments):" << std::endl;
+        dept_df.print();
+
+        // 3. Perform the Join!
+        auto joined_df = df.join(dept_df, "dept", "inner");
+        std::cout << "Joined Table:" << std::endl;
+        joined_df.print();
+
         std::cout << "All basic Eager operations passed successfully!" << std::endl;
 
     } catch (const std::exception& e) {
