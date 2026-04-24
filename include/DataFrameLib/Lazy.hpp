@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 
-// ---------------------------------------------------------
+class EagerDataFrame; // Forward declaration for collect() return type
+
 // Logical Plan Nodes (The DAG)
-// ---------------------------------------------------------
 class LogicalNode {
 public:
     virtual ~LogicalNode() = default;
@@ -59,11 +59,12 @@ public:
 
     std::string to_string() const override; // You'll implement this string joining in the .cpp
     std::vector<std::shared_ptr<LogicalNode>> children() const override { return {input_}; }
+
+    const std::vector<std::string>& columns() const { return columns_; }
+    std::shared_ptr<LogicalNode> input() const { return input_; }
 };
 
-// ---------------------------------------------------------
 // The LazyDataFrame API
-// ---------------------------------------------------------
 class LazyDataFrame {
 private:
     std::shared_ptr<LogicalNode> logical_plan_;
@@ -83,5 +84,5 @@ public:
     // Execution & Debugging
     void explain(const std::string& plan_path) const;
     
-    // EagerDataFrame collect() const; // We will build this in the Optimizer phase!
+    EagerDataFrame collect() const; // We will build this in the Optimizer phase!
 };

@@ -2,6 +2,8 @@
 #include <arrow/csv/api.h>
 #include <arrow/io/api.h>
 #include <parquet/arrow/reader.h>
+#include <arrow/csv/writer.h>
+#include <parquet/arrow/writer.h>
 #include <stdexcept>
 
 EagerDataFrame EagerDataFrame::read_csv(const std::string& path) {
@@ -71,5 +73,52 @@ EagerDataFrame EagerDataFrame::read_parquet(const std::string& path) {
     }
 
     // Wrapping and returning
+    return EagerDataFrame(table);
+}
+
+// Writing functions for CSV and Parquet formats
+void EagerDataFrame::write_csv(const std::string& path) const {
+    auto outfile_result = arrow::io::FileOutputStream::Open(path);
+    if (!outfile_result.ok()) {
+        throw std::runtime_error("Failed to open file for writing: " + path);
+    }
+    auto outfile = *outfile_result;
+
+    auto write_options = arrow::csv::WriteOptions::Defaults();
+    auto status = arrow::csv::WriteCSV(*table_, write_options, outfile.get());
+    
+    if (!status.ok()) {
+        throw std::runtime_error("Failed to write CSV: " + status.ToString());
+    }
+}
+
+void EagerDataFrame::write_parquet(const std::string& path) const {
+    auto outfile_result = arrow::io::FileOutputStream::Open(path);
+    if (!outfile_result.ok()) {
+        throw std::runtime_error("Failed to open file for writing: " + path);
+    }
+    auto outfile = *outfile_result;
+
+    // Write table with default Parquet properties
+    auto status = parquet::arrow::WriteTable(*table_, arrow::default_memory_pool(), outfile, 1024);
+    
+    if (!status.ok()) {
+        throw std::runtime_error("Failed to write Parquet: " + status.ToString());
+    }
+}
+
+//Create a dataframe from a map of column name to arrow array
+EagerDataFrame EagerDataFrame::from_columns(const std::unordered_map<std::string, std::shared_ptr<arrow::Array>>& col_map) {
+    std::vector<std::shared_ptr<arrow::Field>> fields;
+    std::vector<std::shared_ptr<arrow::Array>> arrays;
+    
+    for (const auto& [name, array] : col_map) {
+        fields.push_back(arrow::field(name, array->type()));
+        arrays.push_back(array);
+    }
+    
+    auto schema = std::make_shared<arrow::Schema>(fields);
+    auto table = arrow::Table::Make(schema, arrays);
+    
     return EagerDataFrame(table);
 }

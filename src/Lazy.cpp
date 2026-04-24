@@ -1,4 +1,6 @@
 #include "DataFrameLib/Lazy.hpp"
+#include "DataFrameLib/Optimizer.hpp"
+#include "DataFrameLib/Eager.hpp"
 #include <fstream>
 #include <iostream>
 #include <cstdlib>
@@ -98,4 +100,12 @@ void LazyDataFrame::explain(const std::string& plan_path) const {
     } else {
         throw std::runtime_error("Graphviz failed. Make sure 'dot' is installed via 'sudo apt install graphviz'");
     }
+}
+
+EagerDataFrame LazyDataFrame::collect() const {
+    // 1. Optimize the Logical Plan
+    auto optimized_plan = QueryOptimizer::optimize(logical_plan_);
+    
+    // 2. Compile and execute it into a physical EagerDataFrame
+    return PhysicalPlanCompiler::execute(optimized_plan);
 }

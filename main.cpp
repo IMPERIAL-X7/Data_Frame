@@ -87,8 +87,30 @@ int main() {
                             
         std::cout << "Aggregated Table:" << std::endl;
         grouped_df.print();
-        
         std::cout << "\nAll Core DataFrameLib systems are online!" << std::endl;
+
+        std::cout << "\n=== 10. Testing File Output ===" << std::endl;
+        df.write_csv("output.csv");
+        df.write_parquet("output.parquet");
+        std::cout << "Successfully wrote output.csv and output.parquet!" << std::endl;
+
+        std::cout << "\n=== 11. Testing Lazy Execution & Optimization ===" << std::endl;
+        
+        // Renamed variables to avoid conflicts with Test 7
+        auto lazy_df_opt = LazyDataFrame::scan_csv("test_data.csv");
+        
+        auto lazy_plan_opt = lazy_df_opt
+            .select({"name", "salary"})
+            .filter(col("salary") > lit(90000.0f));
+
+        std::cout << "Writing Unoptimized Plan to unoptimized.png..." << std::endl;
+        lazy_plan_opt.explain("unoptimized.png");
+
+        std::cout << "Executing (collecting) the Lazy DataFrame..." << std::endl;
+        auto final_df = lazy_plan_opt.collect(); 
+        
+        std::cout << "Final Optimized Output:" << std::endl;
+        final_df.print();
 
         std::cout << "All basic Eager operations passed successfully!" << std::endl;
 
