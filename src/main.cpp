@@ -1,8 +1,8 @@
-#include "DataFrameLib/Eager.hpp"
-#include "DataFrameLib/Expr.hpp"
-#include "DataFrameLib/Lazy.hpp"
+#include <dataframelib/dataframelib.h>
 #include <iostream>
 #include <fstream>
+
+using namespace dataframelib;
 
 void create_dummy_csv() {
     std::ofstream file("test_data.csv");
@@ -21,7 +21,7 @@ int main() {
         create_dummy_csv();
 
         std::cout << "\n=== 1. Reading CSV ===" << std::endl;
-        auto df = EagerDataFrame::read_csv("test_data.csv");
+        auto df = read_csv("test_data.csv");
         df.print();
 
         std::cout << "\n=== 2. Testing select() ===" << std::endl;
@@ -29,16 +29,14 @@ int main() {
         df_selected.print();
 
         std::cout << "\n=== 3. Testing filter(age > 30) ===" << std::endl;
-        auto df_filtered = df.filter(col("age") > 30); 
+        auto df_filtered = df.filter(col("age") > 30);
         df_filtered.print();
 
         std::cout << "\n=== 4. Testing with_column() ===" << std::endl;
-        // Adding a column that doubles the salary
         auto df_mutated = df.with_column("double_salary", col("salary") + col("salary"));
         df_mutated.print();
 
         std::cout << "\n=== 5. Testing sort(salary, desc) ===" << std::endl;
-        // Sort by salary descending (false means not ascending)
         auto df_sorted = df.sort({"salary"}, false);
         df_sorted.print();
 
@@ -47,47 +45,34 @@ int main() {
         df_head.print();
 
         std::cout << "\n=== 7. Testing Lazy DAG Construction & Graphviz ===" << std::endl;
-        // Notice we are using the lazy scan, not eager read!
-        auto lazy_df = LazyDataFrame::scan_csv("test_data.csv");
-        
-        // Build a complex chain of operations
+        auto lazy_df = scan_csv("test_data.csv");
         auto lazy_plan = lazy_df
             .filter(col("age") > 30)
             .select({"name", "salary"})
             .filter(col("salary") > lit(90000.0f));
-
-        // This should output a 'plan.png' file in your build directory
         lazy_plan.explain("plan.png");
 
         std::cout << "\n=== 8. Testing INNER JOIN ===" << std::endl;
-        // 1. Our left table is the 'df' we loaded earlier (has 'dept' column)
-        // 2. Let's create a quick right table using EagerDataFrame's CSV reader manually
         std::ofstream dept_file("dept_data.csv");
         dept_file << "dept,manager\n";
         dept_file << "Engineering,Grace Hopper\n";
         dept_file << "Sales,Jordan Belfort\n";
         dept_file.close();
-        
-        auto dept_df = EagerDataFrame::read_csv("dept_data.csv");
+
+        auto dept_df = read_csv("dept_data.csv");
         std::cout << "Right Table (Departments):" << std::endl;
         dept_df.print();
 
-        // 3. Perform the Join!
-        auto joined_df = df.join(dept_df, "dept", "inner");
+        auto joined_df = df.join(dept_df, {"dept"}, "inner");
         std::cout << "Joined Table:" << std::endl;
         joined_df.print();
 
         std::cout << "\n=== 9. Testing GroupBy & Aggregate ===" << std::endl;
-        // Group by department, calculate the mean salary and count of employees
         auto grouped_df = df.group_by({"dept"})
-                            .aggregate({
-                                {"salary", "mean"},
-                                {"id", "count"}
-                            });
-                            
+                            .aggregate({{"salary", "mean"}, {"id", "count"}});
+        // (^ vector<pair<string,string>> — new aggregate signature)
         std::cout << "Aggregated Table:" << std::endl;
         grouped_df.print();
-        std::cout << "\nAll Core DataFrameLib systems are online!" << std::endl;
 
         std::cout << "\n=== 10. Testing File Output ===" << std::endl;
         df.write_csv("output.csv");
@@ -95,21 +80,13 @@ int main() {
         std::cout << "Successfully wrote output.csv and output.parquet!" << std::endl;
 
         std::cout << "\n=== 11. Testing Lazy Execution & Optimization ===" << std::endl;
-        
-        // Renamed variables to avoid conflicts with Test 7
-        auto lazy_df_opt = LazyDataFrame::scan_csv("test_data.csv");
-        
+        auto lazy_df_opt = scan_csv("test_data.csv");
         auto lazy_plan_opt = lazy_df_opt
             .select({"name", "salary"})
             .filter(col("salary") > lit(90000.0f));
 
-        std::cout << "Writing Unoptimized Plan to unoptimized.png..." << std::endl;
         lazy_plan_opt.explain("unoptimized.png");
-
-        std::cout << "Executing (collecting) the Lazy DataFrame..." << std::endl;
-        auto final_df = lazy_plan_opt.collect(); 
-        
-        std::cout << "Final Optimized Output:" << std::endl;
+        auto final_df = lazy_plan_opt.collect();
         final_df.print();
 
         std::cout << "All basic Eager operations passed successfully!" << std::endl;

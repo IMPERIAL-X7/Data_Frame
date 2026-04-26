@@ -1,0 +1,224 @@
+{
+  "passed": 0,
+  "total": 9,
+  "tests": [
+    {
+      "program": "test_io",
+      "compiled": true,
+      "ran": true,
+      "exit_code": 1,
+      "runtime_ms": 6.44,
+      "error": null,
+      "subtests": [
+        {
+          "name": "io_csv_roundtrip",
+          "passed": false,
+          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_io/io_csv_roundtrip.csv"
+        },
+        {
+          "name": "io_parquet_as_csv",
+          "passed": false,
+          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_io/io_parquet_as_csv.csv"
+        },
+        {
+          "name": "io_from_parquet",
+          "passed": false,
+          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_io/io_from_parquet.csv"
+        }
+      ],
+      "timing": {}
+    },
+    {
+      "program": "test_select_filter",
+      "compiled": false,
+      "ran": false,
+      "exit_code": null,
+      "runtime_ms": 0.0,
+      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_select_filter",
+      "subtests": [],
+      "timing": {}
+    },
+    {
+      "program": "test_groupby_agg",
+      "compiled": false,
+      "ran": false,
+      "exit_code": null,
+      "runtime_ms": 0.0,
+      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_groupby_agg",
+      "subtests": [],
+      "timing": {}
+    },
+    {
+      "program": "test_join",
+      "compiled": true,
+      "ran": true,
+      "exit_code": 1,
+      "runtime_ms": 4.43,
+      "error": null,
+      "subtests": [
+        {
+          "name": "join_inner",
+          "passed": false,
+          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_join/join_inner.csv"
+        },
+        {
+          "name": "join_left",
+          "passed": false,
+          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_join/join_left.csv"
+        }
+      ],
+      "timing": {}
+    },
+    {
+      "program": "test_expressions",
+      "compiled": false,
+      "ran": false,
+      "exit_code": null,
+      "runtime_ms": 0.0,
+      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_expressions",
+      "subtests": [],
+      "timing": {}
+    },
+    {
+      "program": "test_string_ops",
+      "compiled": false,
+      "ran": false,
+      "exit_code": null,
+      "runtime_ms": 0.0,
+      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_string_ops",
+      "subtests": [],
+      "timing": {}
+    },
+    {
+      "program": "test_sort_head",
+      "compiled": true,
+      "ran": true,
+      "exit_code": 1,
+      "runtime_ms": 5.15,
+      "error": null,
+      "subtests": [
+        {
+          "name": "sort_asc",
+          "passed": false,
+          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_sort_head/sort_asc.csv"
+        },
+        {
+          "name": "sort_desc",
+          "passed": false,
+          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_sort_head/sort_desc.csv"
+        },
+        {
+          "name": "head_result",
+          "passed": false,
+          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_sort_head/head_result.csv"
+        },
+        {
+          "name": "sort_head",
+          "passed": false,
+          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_sort_head/sort_head.csv"
+        }
+      ],
+      "timing": {}
+    },
+    {
+      "program": "test_with_column",
+      "compiled": false,
+      "ran": false,
+      "exit_code": null,
+      "runtime_ms": 0.0,
+      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_with_column",
+      "subtests": [],
+      "timing": {}
+    },
+    {
+      "program": "test_lazy",
+      "compiled": false,
+      "ran": false,
+      "exit_code": null,
+      "runtime_ms": 0.0,
+      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_lazy",
+      "subtests": [],
+      "timing": {}
+    },
+    {
+      "program": "test_null_types",
+      "compiled": false,
+      "ran": false,
+      "exit_code": null,
+      "runtime_ms": 0.0,
+      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_null_types",
+      "subtests": [],
+      "timing": {}
+    },
+    {
+      "program": "test_edge_cases",
+      "compiled": false,
+      "ran": false,
+      "exit_code": null,
+      "runtime_ms": 0.0,
+      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_edge_cases",
+      "subtests": [],
+      "timing": {}
+    },
+    {
+      "program": "test_operators",
+      "compiled": false,
+      "ran": false,
+      "exit_code": null,
+      "runtime_ms": 0.0,
+      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_operators",
+      "subtests": [],
+      "timing": {}
+    },
+    {
+      "program": "test_advanced_join",
+      "compiled": false,
+      "ran": false,
+      "exit_code": null,
+      "runtime_ms": 0.0,
+      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_advanced_join",
+      "subtests": [],
+      "timing": {}
+    },
+    {
+      "program": "test_chained_ops",
+      "compiled": false,
+      "ran": false,
+      "exit_code": null,
+      "runtime_ms": 0.0,
+      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_chained_ops",
+      "subtests": [],
+      "timing": {}
+    },
+    {
+      "program": "test_advanced_lazy",
+      "compiled": false,
+      "ran": false,
+      "exit_code": null,
+      "runtime_ms": 0.0,
+      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_advanced_lazy",
+      "subtests": [],
+      "timing": {}
+    },
+    {
+      "program": "test_performance",
+      "compiled": false,
+      "ran": false,
+      "exit_code": null,
+      "runtime_ms": 0.0,
+      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_performance",
+      "subtests": [],
+      "timing": {}
+    },
+    {
+      "program": "test_from_columns",
+      "compiled": false,
+      "ran": false,
+      "exit_code": null,
+      "runtime_ms": 0.0,
+      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_from_columns",
+      "subtests": [],
+      "timing": {}
+    }
+  ]
+}
