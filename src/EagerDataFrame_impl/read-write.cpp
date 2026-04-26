@@ -88,11 +88,11 @@ void EagerDataFrame::write_parquet(const std::string& path) const {
 }
 
 EagerDataFrame EagerDataFrame::from_columns(
-    const std::unordered_map<std::string, std::shared_ptr<arrow::Array>>& col_map) {
+    const std::vector<std::pair<std::string, std::shared_ptr<arrow::Array>>>& cols) {
     std::vector<std::shared_ptr<arrow::Field>> fields;
     std::vector<std::shared_ptr<arrow::Array>> arrays;
 
-    for (const auto& [name, array] : col_map) {
+    for (const auto& [name, array] : cols) {
         fields.push_back(arrow::field(name, array->type()));
         arrays.push_back(array);
     }

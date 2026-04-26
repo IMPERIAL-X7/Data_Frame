@@ -7,6 +7,15 @@
 #include "../../src/EagerDataFrame.h"
 #include "../../src/LazyDataFrame.h"
 
+#ifndef ARROW_THROW_NOT_OK
+#define ARROW_THROW_NOT_OK(stmt) do { \
+  ::arrow::Status _s = (stmt); \
+  if (!_s.ok()) { \
+    throw std::runtime_error(_s.ToString()); \
+  } \
+} while(false)
+#endif
+
 namespace dataframelib {
 
 // ---------- Free function I/O API ----------
@@ -30,8 +39,8 @@ inline LazyDataFrame scan_parquet(const std::string& path) {
 }
 
 inline EagerDataFrame from_columns(
-    const std::unordered_map<std::string, std::shared_ptr<arrow::Array>>& col_map) {
-    return EagerDataFrame::from_columns(col_map);
+    const std::vector<std::pair<std::string, std::shared_ptr<arrow::Array>>>& cols) {
+    return EagerDataFrame::from_columns(cols);
 }
 
 }

@@ -47,7 +47,7 @@ public:
     EagerDataFrame select(const std::vector<std::string>& columns) const;
     EagerDataFrame filter(const Expr& predicate) const;
     EagerDataFrame with_column(const std::string& name, const Expr& expr) const;
-    static EagerDataFrame from_columns(const std::unordered_map<std::string, std::shared_ptr<arrow::Array>>& col_map);
+    static EagerDataFrame from_columns(const std::vector<std::pair<std::string, std::shared_ptr<arrow::Array>>>& cols);
 
     EagerDataFrame join(const EagerDataFrame& other, const std::vector<std::string>& on, const std::string& how) const;
     GroupedDataFrame group_by(const std::vector<std::string>& keys) const {
