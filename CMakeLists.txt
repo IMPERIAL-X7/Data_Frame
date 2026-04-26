@@ -32,7 +32,6 @@ add_library(DataFrameLib
 # Link Arrow to your library
 target_link_libraries(DataFrameLib PUBLIC
     Arrow::arrow_shared
-    ArrowDataset::arrow_dataset_shared
     Parquet::parquet_shared
 )
 
