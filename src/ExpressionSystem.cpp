@@ -640,6 +640,8 @@ Expr Expr::alias(const std::string& name) const { return Expr(std::make_shared<A
 Expr col(const std::string& name) { return Expr(std::make_shared<ColExpr>(name)); }
 Expr lit(LitValue value)          { return Expr(std::make_shared<LitExpr>(std::move(value))); }
 Expr lit(int v)                   { return lit(LitValue(static_cast<int32_t>(v))); }
+Expr lit(double v)                { return lit(LitValue(v)); }
+Expr lit(float v)                 { return lit(LitValue(v)); }
 Expr lit(const char* v)           { return lit(LitValue(std::string(v))); }
 
 namespace {

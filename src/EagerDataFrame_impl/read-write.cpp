@@ -34,7 +34,7 @@ EagerDataFrame EagerDataFrame::read_csv(const std::string& path) {
         throw std::runtime_error("Failed to read CSV data: " + table_result.status().ToString());
     }
 
-    return EagerDataFrame(*table_result);
+    return EagerDataFrame((*table_result)->CombineChunks(arrow::default_memory_pool()).ValueOrDie());
 }
 
 EagerDataFrame EagerDataFrame::read_parquet(const std::string& path) {
@@ -57,7 +57,7 @@ EagerDataFrame EagerDataFrame::read_parquet(const std::string& path) {
         throw std::runtime_error("Failed to read Parquet data: " + read_status.ToString());
     }
 
-    return EagerDataFrame(table);
+    return EagerDataFrame(table->CombineChunks(arrow::default_memory_pool()).ValueOrDie());
 }
 
 void EagerDataFrame::write_csv(const std::string& path) const {
@@ -99,7 +99,7 @@ EagerDataFrame EagerDataFrame::from_columns(
 
     auto schema = std::make_shared<arrow::Schema>(fields);
     auto table = arrow::Table::Make(schema, arrays);
-    return EagerDataFrame(table);
+    return EagerDataFrame(table->CombineChunks(arrow::default_memory_pool()).ValueOrDie());
 }
 
 }

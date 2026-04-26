@@ -157,6 +157,9 @@ Expr lit(LitValue value);
 // Convenience lit() overloads — the variant doesn't auto-deduce const char*
 // or int (vs int32_t/int64_t), so accept these explicitly.
 Expr lit(int v);
+Expr lit(int64_t v);
+Expr lit(double v);
+Expr lit(float v);
 Expr lit(const char* v);
 
 // ---- Operators ----

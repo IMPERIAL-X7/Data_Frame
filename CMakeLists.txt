@@ -52,6 +52,10 @@ target_link_libraries(dataframelib PUBLIC
     Parquet::parquet_shared
 )
 
+# Force the compiled binary to prioritize the system's C++ standard library 
+# over Anaconda's outdated libstdc++.so.6 at runtime.
+target_link_options(dataframelib PUBLIC "-Wl,-rpath=/usr/lib/x86_64-linux-gnu")
+
 # Driver binary for local development. Skip when this CMakeLists is consumed
 # as a sub-project (e.g. by the autograder), so the autograder's own build
 # produces only the library.
