@@ -89,6 +89,29 @@ public:
     std::shared_ptr<LogicalNode> input() const { return input_; }
 };
 
+// Fused Sort+Head: pick the top n rows by sort key without fully sorting the
+// rest. The optimizer rewrites Head(Sort(...)) into this. Massive win for
+// "show me the top 100 rows" queries on large tables.
+class TopNNode : public LogicalNode {
+    std::shared_ptr<LogicalNode> input_;
+    std::vector<std::string> columns_;
+    bool asc_;
+    int64_t n_;
+public:
+    TopNNode(std::shared_ptr<LogicalNode> input, std::vector<std::string> columns, bool asc, int64_t n)
+        : input_(std::move(input)), columns_(std::move(columns)), asc_(asc), n_(n) {}
+
+    std::string to_string() const override {
+        return "TopN(n=" + std::to_string(n_) + (asc_ ? ", asc)" : ", desc)");
+    }
+    std::vector<std::shared_ptr<LogicalNode>> children() const override { return {input_}; }
+
+    const std::vector<std::string>& columns() const { return columns_; }
+    bool asc() const { return asc_; }
+    int64_t n() const { return n_; }
+    std::shared_ptr<LogicalNode> input() const { return input_; }
+};
+
 class HeadNode : public LogicalNode {
     std::shared_ptr<LogicalNode> input_;
     int64_t n_;

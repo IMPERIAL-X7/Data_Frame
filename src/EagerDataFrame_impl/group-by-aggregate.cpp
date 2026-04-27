@@ -1,9 +1,10 @@
 #include "../EagerDataFrame.h"
 #include <arrow/builder.h>
 #include <arrow/type_traits.h>
-#include <map>
 #include <sstream>
 #include <stdexcept>
+#include <string_view>
+#include <unordered_map>
 
 namespace dataframelib {
 
@@ -143,25 +144,42 @@ EagerDataFrame GroupedDataFrame::aggregate(const AggSpec& aggs) const {
     }
 
     int64_t n = table_->num_rows();
-    std::map<std::string, std::vector<int64_t>> groups;
-    std::vector<std::string> group_order;
+    std::vector<std::vector<int64_t>> ordered_groups;
     std::vector<int64_t> group_repr_row;
 
-    for (int64_t i = 0; i < n; ++i) {
-        std::string key = compose_key(key_arrays, i);
-        auto it = groups.find(key);
-        if (it == groups.end()) {
-            groups[key] = {i};
-            group_order.push_back(key);
-            group_repr_row.push_back(i);
-        } else {
-            it->second.push_back(i);
+    // Fast path: single string key (the common case). Hashing string_view
+    // avoids the per-row compose_key allocation and the map-vs-unordered_map
+    // tree-walk overhead.
+    if (key_arrays.size() == 1 && key_arrays[0]->type_id() == arrow::Type::STRING) {
+        auto sa = std::static_pointer_cast<arrow::StringArray>(key_arrays[0]);
+        std::unordered_map<std::string_view, int64_t> bucket; // key -> group index
+        bucket.reserve(static_cast<size_t>(n) / 4 + 16);
+        for (int64_t i = 0; i < n; ++i) {
+            if (!sa->IsValid(i)) continue;  // skip null keys
+            std::string_view sv = sa->GetView(i);
+            auto [it, inserted] = bucket.try_emplace(sv, static_cast<int64_t>(ordered_groups.size()));
+            if (inserted) {
+                ordered_groups.emplace_back();
+                group_repr_row.push_back(i);
+            }
+            ordered_groups[it->second].push_back(i);
+        }
+    } else {
+        // General path: hash a composed string key. Still O(N) but with
+        // unordered_map so we get O(1) average inserts.
+        std::unordered_map<std::string, int64_t> bucket;
+        bucket.reserve(static_cast<size_t>(n) / 4 + 16);
+        for (int64_t i = 0; i < n; ++i) {
+            std::string key = compose_key(key_arrays, i);
+            auto [it, inserted] = bucket.try_emplace(std::move(key),
+                                                     static_cast<int64_t>(ordered_groups.size()));
+            if (inserted) {
+                ordered_groups.emplace_back();
+                group_repr_row.push_back(i);
+            }
+            ordered_groups[it->second].push_back(i);
         }
     }
-
-    std::vector<std::vector<int64_t>> ordered_groups;
-    ordered_groups.reserve(group_order.size());
-    for (const auto& k : group_order) ordered_groups.push_back(groups[k]);
 
     // Build output key columns (one per group key, in input order).
     std::vector<std::shared_ptr<arrow::Field>> out_fields;

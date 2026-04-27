@@ -5,7 +5,9 @@
 namespace dataframelib {
 
 std::shared_ptr<LogicalNode> QueryOptimizer::optimize(std::shared_ptr<LogicalNode> plan) {
-    return pushdown_predicates(plan);
+    plan = pushdown_predicates(plan);
+    plan = fuse_top_n(plan);
+    return plan;
 }
 
 EagerDataFrame PhysicalPlanCompiler::execute(const std::shared_ptr<LogicalNode>& node) {
@@ -30,6 +32,9 @@ EagerDataFrame PhysicalPlanCompiler::execute(const std::shared_ptr<LogicalNode>&
     }
     if (auto head = std::dynamic_pointer_cast<HeadNode>(node)) {
         return execute(head->input()).head(head->n());
+    }
+    if (auto topn = std::dynamic_pointer_cast<TopNNode>(node)) {
+        return execute(topn->input()).sort_top_n(topn->columns(), topn->asc(), topn->n());
     }
     if (auto join = std::dynamic_pointer_cast<JoinNode>(node)) {
         return execute(join->left()).join(execute(join->right()), join->on(), join->how());

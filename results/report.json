@@ -1,224 +1,686 @@
 {
-  "passed": 0,
-  "total": 9,
+  "passed": 79,
+  "total": 79,
   "tests": [
     {
       "program": "test_io",
       "compiled": true,
       "ran": true,
-      "exit_code": 1,
-      "runtime_ms": 6.44,
+      "exit_code": 0,
+      "runtime_ms": 30.04,
       "error": null,
       "subtests": [
         {
           "name": "io_csv_roundtrip",
-          "passed": false,
-          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_io/io_csv_roundtrip.csv"
+          "passed": true,
+          "message": "OK"
         },
         {
           "name": "io_parquet_as_csv",
-          "passed": false,
-          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_io/io_parquet_as_csv.csv"
+          "passed": true,
+          "message": "OK"
         },
         {
           "name": "io_from_parquet",
-          "passed": false,
-          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_io/io_from_parquet.csv"
+          "passed": true,
+          "message": "OK"
         }
       ],
-      "timing": {}
+      "timing": {
+        "read_csv": 2.01382,
+        "write_csv": 2.17786,
+        "write_parquet": 0.628611,
+        "read_parquet": 0.334246,
+        "read_parquet_direct": 0.217347
+      }
     },
     {
       "program": "test_select_filter",
-      "compiled": false,
-      "ran": false,
-      "exit_code": null,
-      "runtime_ms": 0.0,
-      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_select_filter",
-      "subtests": [],
-      "timing": {}
+      "compiled": true,
+      "ran": true,
+      "exit_code": 0,
+      "runtime_ms": 31.09,
+      "error": null,
+      "subtests": [
+        {
+          "name": "select_result",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "filter_gt",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "filter_eq",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "filter_compound",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "filter_select",
+          "passed": true,
+          "message": "OK"
+        }
+      ],
+      "timing": {
+        "select": 0.004031,
+        "filter_gt": 0.22703,
+        "filter_eq": 0.146729,
+        "filter_compound": 0.233165,
+        "filter_select": 0.173201
+      }
     },
     {
       "program": "test_groupby_agg",
-      "compiled": false,
-      "ran": false,
-      "exit_code": null,
-      "runtime_ms": 0.0,
-      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_groupby_agg",
-      "subtests": [],
-      "timing": {}
+      "compiled": true,
+      "ran": true,
+      "exit_code": 0,
+      "runtime_ms": 18.45,
+      "error": null,
+      "subtests": [
+        {
+          "name": "groupby_result",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "groupby_multi",
+          "passed": true,
+          "message": "OK"
+        }
+      ],
+      "timing": {
+        "groupby_single": 0.194663,
+        "groupby_multi": 0.237088
+      }
     },
     {
       "program": "test_join",
       "compiled": true,
       "ran": true,
-      "exit_code": 1,
-      "runtime_ms": 4.43,
+      "exit_code": 0,
+      "runtime_ms": 32.26,
       "error": null,
       "subtests": [
         {
           "name": "join_inner",
-          "passed": false,
-          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_join/join_inner.csv"
+          "passed": true,
+          "message": "OK"
         },
         {
           "name": "join_left",
-          "passed": false,
-          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_join/join_left.csv"
+          "passed": true,
+          "message": "OK"
         }
       ],
-      "timing": {}
+      "timing": {
+        "join_inner": 0.367719,
+        "join_left": 0.265937
+      }
     },
     {
       "program": "test_expressions",
-      "compiled": false,
-      "ran": false,
-      "exit_code": null,
-      "runtime_ms": 0.0,
-      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_expressions",
-      "subtests": [],
-      "timing": {}
+      "compiled": true,
+      "ran": true,
+      "exit_code": 0,
+      "runtime_ms": 31.03,
+      "error": null,
+      "subtests": [
+        {
+          "name": "expr_bonus",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "expr_abs",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "expr_complex_filter",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "expr_arith_chain",
+          "passed": true,
+          "message": "OK"
+        }
+      ],
+      "timing": {
+        "expr_bonus": 0.084423,
+        "expr_abs": 0.025029,
+        "expr_complex_filter": 0.231068,
+        "expr_arith_chain": 0.069387
+      }
     },
     {
       "program": "test_string_ops",
-      "compiled": false,
-      "ran": false,
-      "exit_code": null,
-      "runtime_ms": 0.0,
-      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_string_ops",
-      "subtests": [],
-      "timing": {}
+      "compiled": true,
+      "ran": true,
+      "exit_code": 0,
+      "runtime_ms": 19.31,
+      "error": null,
+      "subtests": [
+        {
+          "name": "contains_result",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "upper_result",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "lower_result",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "startswith_result",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "endswith_result",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "length_result",
+          "passed": true,
+          "message": "OK"
+        }
+      ],
+      "timing": {
+        "str_contains": 0.116636,
+        "str_upper": 0.053156,
+        "str_lower": 0.01463,
+        "str_startswith": 0.031765,
+        "str_endswith": 0.02431,
+        "str_length": 0.007246
+      }
     },
     {
       "program": "test_sort_head",
       "compiled": true,
       "ran": true,
-      "exit_code": 1,
-      "runtime_ms": 5.15,
+      "exit_code": 0,
+      "runtime_ms": 30.15,
       "error": null,
       "subtests": [
         {
           "name": "sort_asc",
-          "passed": false,
-          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_sort_head/sort_asc.csv"
+          "passed": true,
+          "message": "OK"
         },
         {
           "name": "sort_desc",
-          "passed": false,
-          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_sort_head/sort_desc.csv"
+          "passed": true,
+          "message": "OK"
         },
         {
           "name": "head_result",
-          "passed": false,
-          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_sort_head/head_result.csv"
+          "passed": true,
+          "message": "OK"
         },
         {
           "name": "sort_head",
-          "passed": false,
-          "message": "Output file not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/test_outputs/test_sort_head/sort_head.csv"
+          "passed": true,
+          "message": "OK"
         }
       ],
-      "timing": {}
+      "timing": {
+        "sort_asc": 0.50863,
+        "sort_desc": 0.21908,
+        "head": 0.015687,
+        "sort_head": 0.192153
+      }
     },
     {
       "program": "test_with_column",
-      "compiled": false,
-      "ran": false,
-      "exit_code": null,
-      "runtime_ms": 0.0,
-      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_with_column",
-      "subtests": [],
-      "timing": {}
+      "compiled": true,
+      "ran": true,
+      "exit_code": 0,
+      "runtime_ms": 20.97,
+      "error": null,
+      "subtests": [
+        {
+          "name": "wc_doubled",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "wc_sum",
+          "passed": true,
+          "message": "OK"
+        }
+      ],
+      "timing": {
+        "wc_doubled": 0.098689,
+        "wc_sum": 0.058055
+      }
     },
     {
       "program": "test_lazy",
-      "compiled": false,
-      "ran": false,
-      "exit_code": null,
-      "runtime_ms": 0.0,
-      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_lazy",
-      "subtests": [],
-      "timing": {}
+      "compiled": true,
+      "ran": true,
+      "exit_code": 0,
+      "runtime_ms": 74.46,
+      "error": null,
+      "subtests": [
+        {
+          "name": "lazy_filter",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "lazy_select",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "lazy_groupby",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "lazy_chain",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "lazy_sink",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "lazy_explain",
+          "passed": true,
+          "message": ""
+        }
+      ],
+      "timing": {
+        "lazy_filter": 2.5666,
+        "lazy_select": 0.950521,
+        "lazy_groupby": 1.0398,
+        "lazy_chain": 0.663459,
+        "lazy_sink": 1.04309
+      }
     },
     {
       "program": "test_null_types",
-      "compiled": false,
-      "ran": false,
-      "exit_code": null,
-      "runtime_ms": 0.0,
-      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_null_types",
-      "subtests": [],
-      "timing": {}
+      "compiled": true,
+      "ran": true,
+      "exit_code": 0,
+      "runtime_ms": 19.02,
+      "error": null,
+      "subtests": [
+        {
+          "name": "is_null_result",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "is_not_null_result",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "null_arith",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "null_filter_compute",
+          "passed": true,
+          "message": "OK"
+        }
+      ],
+      "timing": {
+        "is_null": 0.075207,
+        "is_not_null": 0.026092,
+        "null_arith": 0.011387,
+        "null_filter_compute": 0.02063
+      }
     },
     {
       "program": "test_edge_cases",
-      "compiled": false,
-      "ran": false,
-      "exit_code": null,
-      "runtime_ms": 0.0,
-      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_edge_cases",
-      "subtests": [],
-      "timing": {}
+      "compiled": true,
+      "ran": true,
+      "exit_code": 0,
+      "runtime_ms": 35.97,
+      "error": null,
+      "subtests": [
+        {
+          "name": "edge_empty_filter",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "edge_head_zero",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "edge_head_large",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "edge_select_single",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "edge_replace_col",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "edge_filter_all",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "edge_single_group",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "edge_double_sort",
+          "passed": true,
+          "message": "OK"
+        }
+      ],
+      "timing": {
+        "edge_empty_filter": 0.184203,
+        "edge_head_zero": 0.011625,
+        "edge_head_large": 0.000197,
+        "edge_select_single": 0.003952,
+        "edge_replace_col": 0.035955,
+        "edge_filter_all": 0.153899,
+        "edge_single_group": 0.148731,
+        "edge_double_sort": 0.61063
+      }
     },
     {
       "program": "test_operators",
-      "compiled": false,
-      "ran": false,
-      "exit_code": null,
-      "runtime_ms": 0.0,
-      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_operators",
-      "subtests": [],
-      "timing": {}
+      "compiled": true,
+      "ran": true,
+      "exit_code": 0,
+      "runtime_ms": 42.43,
+      "error": null,
+      "subtests": [
+        {
+          "name": "ops_subtract",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "ops_divide",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "ops_modulo",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "ops_less",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "ops_less_equal",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "ops_greater_equal",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "ops_not_equal",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "ops_not",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "ops_nested_arith",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "ops_bool_combo",
+          "passed": true,
+          "message": "OK"
+        }
+      ],
+      "timing": {
+        "ops_subtract": 0.364273,
+        "ops_divide": 0.043656,
+        "ops_modulo": 0.137953,
+        "ops_less": 0.110746,
+        "ops_less_equal": 0.088699,
+        "ops_greater_equal": 0.126483,
+        "ops_not_equal": 0.219688,
+        "ops_not": 0.148954,
+        "ops_nested_arith": 0.105976,
+        "ops_bool_combo": 0.322585
+      }
     },
     {
       "program": "test_advanced_join",
-      "compiled": false,
-      "ran": false,
-      "exit_code": null,
-      "runtime_ms": 0.0,
-      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_advanced_join",
-      "subtests": [],
-      "timing": {}
+      "compiled": true,
+      "ran": true,
+      "exit_code": 0,
+      "runtime_ms": 34.69,
+      "error": null,
+      "subtests": [
+        {
+          "name": "join_outer",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "join_empty_inner",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "join_self",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "join_right_nulls",
+          "passed": true,
+          "message": "OK"
+        }
+      ],
+      "timing": {
+        "join_outer": 0.486417,
+        "join_empty_inner": 0.153176,
+        "join_self": 0.533271,
+        "join_right_nulls": 0.148881
+      }
     },
     {
       "program": "test_chained_ops",
-      "compiled": false,
-      "ran": false,
-      "exit_code": null,
-      "runtime_ms": 0.0,
-      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_chained_ops",
-      "subtests": [],
-      "timing": {}
+      "compiled": true,
+      "ran": true,
+      "exit_code": 0,
+      "runtime_ms": 28.6,
+      "error": null,
+      "subtests": [
+        {
+          "name": "chain_filter_sort_head",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "chain_wc_filter_gb",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "chain_multi_filter",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "chain_select_wc",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "chain_full_pipeline",
+          "passed": true,
+          "message": "OK"
+        }
+      ],
+      "timing": {
+        "chain_filter_sort_head": 0.565729,
+        "chain_wc_filter_gb": 0.27682,
+        "chain_multi_filter": 0.521364,
+        "chain_select_wc": 0.02689,
+        "chain_full_pipeline": 0.559934
+      }
     },
     {
       "program": "test_advanced_lazy",
-      "compiled": false,
-      "ran": false,
-      "exit_code": null,
-      "runtime_ms": 0.0,
-      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_advanced_lazy",
-      "subtests": [],
-      "timing": {}
+      "compiled": true,
+      "ran": true,
+      "exit_code": 0,
+      "runtime_ms": 25.77,
+      "error": null,
+      "subtests": [
+        {
+          "name": "lazy_join",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "lazy_with_column",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "lazy_sort_head",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "lazy_predicate_push",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "lazy_full_pipeline",
+          "passed": true,
+          "message": "OK"
+        }
+      ],
+      "timing": {
+        "lazy_join": 2.77233,
+        "lazy_with_column": 1.16841,
+        "lazy_sort_head": 0.761297,
+        "lazy_predicate_push": 0.729444,
+        "lazy_full_pipeline": 0.662763
+      }
     },
     {
       "program": "test_performance",
-      "compiled": false,
-      "ran": false,
-      "exit_code": null,
-      "runtime_ms": 0.0,
-      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_performance",
-      "subtests": [],
-      "timing": {}
+      "compiled": true,
+      "ran": true,
+      "exit_code": 0,
+      "runtime_ms": 105.67,
+      "error": null,
+      "subtests": [
+        {
+          "name": "perf_filter",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "perf_groupby",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "perf_sort",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "perf_lazy_chain",
+          "passed": true,
+          "message": "OK"
+        }
+      ],
+      "timing": {
+        "perf_read_large": 13.575,
+        "perf_filter": 6.12209,
+        "perf_groupby": 2.64351,
+        "perf_sort": 26.5255,
+        "perf_lazy_chain": 21.3967
+      }
     },
     {
       "program": "test_from_columns",
-      "compiled": false,
-      "ran": false,
-      "exit_code": null,
-      "runtime_ms": 0.0,
-      "error": "Binary not found: /home/imperial-x/Documents/GitHub/Data_Frame/results/build/test_from_columns",
-      "subtests": [],
-      "timing": {}
+      "compiled": true,
+      "ran": true,
+      "exit_code": 0,
+      "runtime_ms": 16.75,
+      "error": null,
+      "subtests": [
+        {
+          "name": "fc_simple",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "fc_filter",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "fc_with_column",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "fc_empty",
+          "passed": true,
+          "message": "OK"
+        },
+        {
+          "name": "fc_select",
+          "passed": true,
+          "message": "OK"
+        }
+      ],
+      "timing": {
+        "fc_simple": 0.787404,
+        "fc_filter": 0.031619,
+        "fc_with_column": 0.014166,
+        "fc_empty": 0.001452,
+        "fc_select": 0.005825
+      }
     }
   ]
 }

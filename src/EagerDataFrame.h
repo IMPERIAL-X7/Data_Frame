@@ -43,6 +43,9 @@ public:
 
     EagerDataFrame sort(const std::vector<std::string>& columns, bool asc) const;
     EagerDataFrame head(int64_t n) const;
+    // Internal fast-path used by the lazy optimizer to fuse Sort+Head: pick
+    // the top n rows by sort key without fully ordering the rest.
+    EagerDataFrame sort_top_n(const std::vector<std::string>& columns, bool asc, int64_t n) const;
 
     EagerDataFrame select(const std::vector<std::string>& columns) const;
     EagerDataFrame filter(const Expr& predicate) const;

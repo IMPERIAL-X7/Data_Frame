@@ -100,4 +100,72 @@ EagerDataFrame EagerDataFrame::sort(const std::vector<std::string>& columns, boo
     return EagerDataFrame(sorted_table);
 }
 
+// Partial-sort fast path: keep only the top n rows under the sort order.
+// Used by the lazy optimizer's TopN fusion rule (Head(n) on Sort → TopN(n)).
+// Complexity: O(N log n) versus O(N log N) for the full sort, plus we only
+// "take" n rows per column instead of N, which is the bigger constant win.
+EagerDataFrame EagerDataFrame::sort_top_n(const std::vector<std::string>& columns,
+                                          bool asc, int64_t n) const {
+    int64_t total = table_->num_rows();
+    if (columns.empty() || total == 0) return head(n);
+    if (n <= 0) return head(0);
+    if (n >= total) return sort(columns, asc);
+
+    std::vector<int64_t> indices(total);
+    std::iota(indices.begin(), indices.end(), 0);
+
+    // Apply partial_sort once per key, in reverse order so the primary key
+    // wins (mirrors the stable_sort layering in sort()).
+    for (auto it = columns.rbegin(); it != columns.rend(); ++it) {
+        auto col_chunked = table_->GetColumnByName(*it);
+        if (!col_chunked) throw std::runtime_error("sort_top_n: column not found: " + *it);
+        auto arr = col_chunked->chunk(0);
+
+        auto run = [&](auto type_tag) {
+            using ArrowType = decltype(type_tag);
+            using ArrayType = typename arrow::TypeTraits<ArrowType>::ArrayType;
+            auto typed = std::static_pointer_cast<ArrayType>(arr);
+            std::partial_sort(indices.begin(), indices.begin() + n, indices.end(),
+                [&](int64_t a, int64_t b) {
+                    bool av = typed->IsValid(a), bv = typed->IsValid(b);
+                    if (!av && !bv) return false;
+                    if (!av) return false;
+                    if (!bv) return true;
+                    if (asc) return typed->GetView(a) < typed->GetView(b);
+                    return typed->GetView(a) > typed->GetView(b);
+                });
+        };
+
+        switch (arr->type_id()) {
+            case arrow::Type::INT32:  run(arrow::Int32Type{});  break;
+            case arrow::Type::INT64:  run(arrow::Int64Type{});  break;
+            case arrow::Type::FLOAT:  run(arrow::FloatType{});  break;
+            case arrow::Type::DOUBLE: run(arrow::DoubleType{}); break;
+            case arrow::Type::STRING: run(arrow::StringType{}); break;
+            case arrow::Type::BOOL:   run(arrow::BooleanType{}); break;
+            default: throw std::runtime_error("sort_top_n: unsupported type");
+        }
+    }
+
+    indices.resize(n);
+
+    std::vector<std::shared_ptr<arrow::ChunkedArray>> taken_columns;
+    for (int i = 0; i < table_->num_columns(); ++i) {
+        auto col_array = table_->column(i)->chunk(0);
+        std::shared_ptr<arrow::Array> taken_arr;
+
+        switch (col_array->type_id()) {
+            case arrow::Type::INT32:  taken_arr = manual_take<arrow::Int32Type>(col_array, indices);  break;
+            case arrow::Type::INT64:  taken_arr = manual_take<arrow::Int64Type>(col_array, indices);  break;
+            case arrow::Type::FLOAT:  taken_arr = manual_take<arrow::FloatType>(col_array, indices);  break;
+            case arrow::Type::DOUBLE: taken_arr = manual_take<arrow::DoubleType>(col_array, indices); break;
+            case arrow::Type::STRING: taken_arr = manual_take<arrow::StringType>(col_array, indices); break;
+            case arrow::Type::BOOL:   taken_arr = manual_take<arrow::BooleanType>(col_array, indices); break;
+            default: throw std::runtime_error("sort_top_n: unsupported take type");
+        }
+        taken_columns.push_back(std::make_shared<arrow::ChunkedArray>(taken_arr));
+    }
+    return EagerDataFrame(arrow::Table::Make(table_->schema(), taken_columns));
+}
+
 }
