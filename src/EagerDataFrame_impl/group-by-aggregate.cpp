@@ -1,3 +1,14 @@
+// Group-by + aggregate, hand-rolled (no Arrow compute / Acero).
+//
+// Two-stage execution:
+//   1. Bucket rows by composed key. Single-string-key tables get a fast
+//      path that hashes string_view directly so we skip per-row composition.
+//   2. For each (col, func) in the AggSpec, run a typed reduction over the
+//      pre-bucketed row indices and emit one output cell per group.
+//
+// Output schema: keys first (in input order), then "<col>_<func>" for each
+// aggregation. Group order is the order in which keys were first observed.
+
 #include "../EagerDataFrame.h"
 #include <arrow/builder.h>
 #include <arrow/type_traits.h>

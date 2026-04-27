@@ -1,22 +1,35 @@
 #pragma once
 
+// Expression system used by filter / with_column / aggregate.
+//
+// Two layers:
+//
+//   ExprNode (abstract)         — the AST. Subclasses model column refs,
+//   ├── ColExpr                   literals, binary/unary ops, string
+//   ├── LitExpr                   predicates, aggregations, aliases. Each
+//   ├── BinaryExpr                provides evaluate(table) which returns an
+//   ├── UnaryExpr                 arrow::Datum, plus to_string() for plan
+//   ├── StringPredicateExpr       rendering.
+//   ├── AggExpr
+//   └── AliasExpr
+//
+//   Expr (value class)          — what user code sees. Wraps an
+//                                 ExprNodePtr and hosts the .method() and
+//                                 operator overloads required by the spec
+//                                 (col("x").is_null(), col("a") > 30, ...).
+//
+// Why the split? The spec requires method-call syntax — col("x").abs(),
+// col("name").to_upper() — which can't work if col() returns a
+// shared_ptr<ExprNode> (operator. is not overloadable on shared_ptr). So
+// col() returns a value-type wrapper, and that wrapper carries every
+// builder method.
+
 #include <arrow/api.h>
 #include <memory>
 #include <string>
 #include <variant>
 
 namespace dataframelib {
-
-// ---------------------------------------------------------
-// Internal AST: ExprNode hierarchy
-// ---------------------------------------------------------
-// User code never touches ExprNode directly — it interacts with the value
-// class `Expr` defined below, which wraps a shared_ptr<ExprNode>.
-//
-// Why the split? The spec requires method-call syntax like
-//   col("x").is_null(), col("salary").mean(), col("name").to_upper()
-// which is impossible if col() returns shared_ptr<...>. The value class
-// hosts these methods and the operator overloads.
 
 class ExprNode {
 public:

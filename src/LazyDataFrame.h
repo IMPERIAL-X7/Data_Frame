@@ -12,6 +12,14 @@ namespace dataframelib {
 class EagerDataFrame;
 class LazyGroupedDataFrame;
 
+// Deferred-execution dataframe. Every operation is a constant-time builder
+// call that wraps the previous LogicalNode in a new node — no data is read
+// or processed until collect()/sink_*() runs the plan through the optimizer
+// and physical compiler.
+//
+// The trade-off versus EagerDataFrame: more bookkeeping per call, but the
+// optimizer can rewrite the whole plan (predicate/projection pushdown,
+// Sort+Head fusion, ...) before any I/O happens.
 class LazyDataFrame {
 private:
     std::shared_ptr<LogicalNode> logical_plan_;
@@ -44,6 +52,8 @@ public:
     std::shared_ptr<LogicalNode> plan() const { return logical_plan_; }
 };
 
+// Lazy counterpart of GroupedDataFrame: holds the in-flight plan plus the
+// grouping keys until aggregate() finishes the pair into a GroupAggNode.
 class LazyGroupedDataFrame {
     std::shared_ptr<LogicalNode> input_;
     std::vector<std::string> keys_;

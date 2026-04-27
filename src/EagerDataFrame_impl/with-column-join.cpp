@@ -1,3 +1,21 @@
+// with_column + join, hand-rolled.
+//
+// with_column either appends a new column or replaces an existing one with
+// the same name. The expression is evaluated against the current table; if
+// the result is a scalar (e.g. a literal expression), it gets broadcast to
+// the table's row count.
+//
+// join is a hash join:
+//   1. Build:  hash the right table's join key into a multi-map (we keep
+//              every matching row, so duplicate keys produce the cartesian
+//              product of their row sets).
+//   2. Probe:  scan the left key, emit (left_idx, right_idx) pairs for
+//              every match. left/outer joins also emit unmatched left rows
+//              with right_idx = -1; outer also flushes unmatched right rows
+//              at the end.
+//   3. Take:   build the output columns by indexing into both inputs with
+//              the matched index vectors.
+
 #include "../EagerDataFrame.h"
 #include <arrow/builder.h>
 #include <arrow/type_traits.h>

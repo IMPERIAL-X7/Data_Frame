@@ -12,9 +12,16 @@ namespace dataframelib {
 
 class EagerDataFrame;
 
-// (column_name, function_name) e.g. {"salary", "mean"}.
+// Aggregation spec: ordered list of (column_name, function_name) pairs,
+// e.g. {{"salary", "sum"}, {"salary", "count"}}. The same column may appear
+// multiple times with different functions; the result columns are named
+// "<col>_<func>".
 using AggSpec = std::vector<std::pair<std::string, std::string>>;
 
+// Intermediate object returned by EagerDataFrame::group_by(). It holds the
+// input table plus the grouping keys until aggregate() is called. We don't
+// actually do the grouping until aggregate() so that group_by alone has
+// no cost.
 class GroupedDataFrame {
 private:
     std::shared_ptr<arrow::Table> table_;
@@ -27,6 +34,11 @@ public:
     EagerDataFrame aggregate(const AggSpec& aggs) const;
 };
 
+// Materialised dataframe — every operation runs immediately and returns a
+// new EagerDataFrame backed by a fresh Arrow table. The underlying storage
+// is `std::shared_ptr<arrow::Table>` so copies are cheap (just a refcount
+// bump) and the data layout is always single-chunk after read/from_columns
+// (we call CombineChunks so per-row indexing stays O(1)).
 class EagerDataFrame {
     friend class GroupedDataFrame;
 private:
@@ -37,6 +49,10 @@ public:
 
     static EagerDataFrame read_csv(const std::string& path);
     static EagerDataFrame read_parquet(const std::string& path);
+    // Projection-pushdown variants: read only the listed columns from the
+    // source. Used by the lazy optimizer when downstream needs a subset.
+    static EagerDataFrame read_csv(const std::string& path, const std::vector<std::string>& columns);
+    static EagerDataFrame read_parquet(const std::string& path, const std::vector<std::string>& columns);
 
     void write_csv(const std::string& path) const;
     void write_parquet(const std::string& path) const;

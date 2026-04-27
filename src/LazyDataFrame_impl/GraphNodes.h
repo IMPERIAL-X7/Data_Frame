@@ -1,5 +1,18 @@
 #pragma once
 
+// Logical-plan node hierarchy for the lazy execution engine.
+//
+// Each LazyDataFrame operation (filter, select, sort, ...) builds one of
+// these nodes wrapping its input — the result is a small DAG describing the
+// computation. No data is read or processed during construction; the tree
+// is rewritten by QueryOptimizer and finally walked by PhysicalPlanCompiler
+// when collect() is called.
+//
+// Node responsibilities:
+//   - to_string()   : human-readable label, used by explain() / Graphviz.
+//   - children()    : enumerate inputs so generic walks (rendering, schema
+//                     analysis) don't need per-node knowledge.
+
 #include "../ExpressionSystem.h"
 #include <memory>
 #include <string>
@@ -15,20 +28,40 @@ public:
     virtual std::vector<std::shared_ptr<LogicalNode>> children() const = 0;
 };
 
+// Leaf: read a CSV/Parquet file. The optimizer's projection-pushdown pass
+// may set restrict_columns_ so only the listed columns are materialised.
+
 class ScanNode : public LogicalNode {
     std::string path_;
     std::string format_;
+    // If non-empty, the projection-pushdown pass has restricted this scan to
+    // only read these columns. Empty means "read everything" (default).
+    std::vector<std::string> restrict_columns_;
 public:
     ScanNode(std::string path, std::string format)
         : path_(std::move(path)), format_(std::move(format)) {}
 
-    std::string to_string() const override { return "Scan(" + format_ + ": " + path_ + ")"; }
+    std::string to_string() const override {
+        std::string s = "Scan(" + format_ + ": " + path_;
+        if (!restrict_columns_.empty()) {
+            s += ", cols=[";
+            for (size_t i = 0; i < restrict_columns_.size(); ++i) {
+                if (i) s += ",";
+                s += restrict_columns_[i];
+            }
+            s += "]";
+        }
+        return s + ")";
+    }
     std::vector<std::shared_ptr<LogicalNode>> children() const override { return {}; }
 
     const std::string& path() const { return path_; }
     const std::string& format() const { return format_; }
+    const std::vector<std::string>& restrict_columns() const { return restrict_columns_; }
+    void set_restrict_columns(std::vector<std::string> cols) { restrict_columns_ = std::move(cols); }
 };
 
+// Row filter — keeps rows where `predicate` evaluates to true.
 class FilterNode : public LogicalNode {
     std::shared_ptr<LogicalNode> input_;
     Expr predicate_;
@@ -43,6 +76,8 @@ public:
     std::shared_ptr<LogicalNode> input() const { return input_; }
 };
 
+// Column projection — emit only the named columns. Note: the order of
+// `columns_` is the output column order. This is what `select()` produces.
 class ProjectNode : public LogicalNode {
     std::shared_ptr<LogicalNode> input_;
     std::vector<std::string> columns_;
@@ -57,6 +92,8 @@ public:
     std::shared_ptr<LogicalNode> input() const { return input_; }
 };
 
+// Add or replace a column. Output schema = input schema with `name` either
+// inserted (new column) or overwritten (existing column).
 class WithColumnNode : public LogicalNode {
     std::shared_ptr<LogicalNode> input_;
     std::string name_;
@@ -73,6 +110,8 @@ public:
     std::shared_ptr<LogicalNode> input() const { return input_; }
 };
 
+// Sort all rows by the given keys (lexicographic when multiple). Single
+// asc/desc applies to all keys, matching the assignment's signature.
 class SortNode : public LogicalNode {
     std::shared_ptr<LogicalNode> input_;
     std::vector<std::string> columns_;
@@ -112,6 +151,8 @@ public:
     std::shared_ptr<LogicalNode> input() const { return input_; }
 };
 
+// Take the first n rows (preserves input order). When the immediate child
+// is a SortNode, the optimizer fuses the pair into TopNNode for speed.
 class HeadNode : public LogicalNode {
     std::shared_ptr<LogicalNode> input_;
     int64_t n_;
@@ -126,6 +167,8 @@ public:
     std::shared_ptr<LogicalNode> input() const { return input_; }
 };
 
+// Equi-join on the columns named in `on_`. `how_` is "inner" / "left" /
+// "outer". This is the only binary node — it has two children.
 class JoinNode : public LogicalNode {
     std::shared_ptr<LogicalNode> left_;
     std::shared_ptr<LogicalNode> right_;
@@ -146,6 +189,9 @@ public:
     const std::string& how() const { return how_; }
 };
 
+// Group-by + aggregate as a single node — they always come together in this
+// engine. `aggs_` is a list of (input_col, function_name) pairs; each
+// produces an output column named "<col>_<func>" (e.g. salary_mean).
 class GroupAggNode : public LogicalNode {
     std::shared_ptr<LogicalNode> input_;
     std::vector<std::string> keys_;

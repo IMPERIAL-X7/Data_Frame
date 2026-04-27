@@ -1,3 +1,8 @@
+// LazyDataFrame builder methods — every operation just wraps the current
+// logical plan in a new LogicalNode. No data is read or processed here.
+// The real work happens in collect()/sink_*(), which call the optimizer
+// and then PhysicalPlanCompiler::execute.
+
 #include "../LazyDataFrame.h"
 #include "../EagerDataFrame.h"
 #include "QueryOptimizer.h"

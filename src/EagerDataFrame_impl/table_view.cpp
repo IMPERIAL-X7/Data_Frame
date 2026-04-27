@@ -1,3 +1,9 @@
+// filter() + print() — operations that produce a "view" of the table.
+//
+// filter is mask-driven: evaluate the predicate to a BooleanArray, then
+// iterate every column and copy rows where the mask is true. We dispatch
+// per-column on Arrow type so each pass is a tight typed loop.
+
 #include "../EagerDataFrame.h"
 #include <arrow/builder.h>
 #include <arrow/type_traits.h>

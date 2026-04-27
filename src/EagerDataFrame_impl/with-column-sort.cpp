@@ -1,3 +1,13 @@
+// sort() + sort_top_n() — both share the indirect-sort pattern.
+//
+// We never move the underlying column data: instead we sort an int64 index
+// vector, then "take" each column through that index vector to build the
+// output. Multi-key sort uses stable_sort on the keys in reverse order so
+// the primary key dominates (classic radix-style ordering).
+//
+// sort_top_n is the partial-sort fast path used by the lazy optimizer's
+// Sort+Head fusion. See QueryOptimizerStructural.cpp.
+
 #include "../EagerDataFrame.h"
 #include <arrow/builder.h>
 #include <arrow/type_traits.h>

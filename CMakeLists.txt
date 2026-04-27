@@ -25,18 +25,12 @@ add_library(dataframelib
     src/LazyDataFrame_impl/LazyDataFrame.cpp
     src/LazyDataFrame_impl/PlanNodes.cpp
     src/LazyDataFrame_impl/GraphVizUtils.cpp
-    src/LazyDataFrame_impl/QueryOptimizerFacade.cpp
-    src/LazyDataFrame_impl/QueryOptimizerPredicate.cpp
-    src/LazyDataFrame_impl/QueryOptimizerProjection.cpp
-    src/LazyDataFrame_impl/QueryOptimizerExpression.cpp
-    src/LazyDataFrame_impl/QueryOptimizerStructural.cpp
-    src/LazyDataFrame_impl/QueryOptimizerRewrite.cpp
-    src/LazyDataFrame_impl/QueryOptimizerSchema.cpp
-    src/LazyDataFrame_impl/QueryOptimizerCost.cpp
-    src/LazyDataFrame_impl/QueryOptimizerCostRows.cpp
-    src/LazyDataFrame_impl/QueryOptimizerCostSelectivity.cpp
-    src/LazyDataFrame_impl/QueryOptimizerCostWidth.cpp
-    src/LazyDataFrame_impl/QueryOptimizerUnary.cpp
+    src/LazyDataFrame_impl/QueryOptimizerFacade.cpp        # pipeline orchestration
+    src/LazyDataFrame_impl/QueryOptimizerExpression.cpp    # constant folding + algebraic simplification
+    src/LazyDataFrame_impl/QueryOptimizerPredicate.cpp     # predicate pushdown
+    src/LazyDataFrame_impl/QueryOptimizerProjection.cpp    # projection pushdown
+    src/LazyDataFrame_impl/QueryOptimizerStructural.cpp    # Sort+Head → TopN fusion (limit pushdown)
+    src/LazyDataFrame_impl/QueryOptimizerSchema.cpp        # column-reference analysis (helper)
 )
 
 target_include_directories(dataframelib PUBLIC

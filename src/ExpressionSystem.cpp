@@ -1,3 +1,22 @@
+// Expression evaluation engine — all operators are implemented manually,
+// without depending on Arrow's compute kernels or Acero (per assignment
+// constraint). Each ExprNode subclass exposes evaluate(table) → arrow::Datum.
+//
+// File layout below:
+//   1. helpers       — datum_to_array, type promotion, cast loops, manual
+//                      math/cmp dispatchers. All in an anonymous namespace.
+//   2. ColExpr / LitExpr / AliasExpr — leaves and wrappers.
+//   3. BinaryExpr    — arith, comparison, boolean. Includes the
+//                      array-vs-scalar fast path that avoids broadcasting
+//                      a literal to a 100K-row array.
+//   4. UnaryExpr     — abs, neg, not, is_null, is_not_null, length,
+//                      to_lower, to_upper.
+//   5. StringPredicateExpr — contains / starts_with / ends_with.
+//   6. AggExpr       — sum / mean / count / min / max — collapses a
+//                      column to a single scalar.
+//   7. Expr value class — public method/operator API (col("x").mean(),
+//                         col("a") > 30, etc.).
+
 #include "ExpressionSystem.h"
 #include <arrow/builder.h>
 #include <arrow/type_traits.h>

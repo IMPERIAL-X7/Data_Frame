@@ -1,3 +1,13 @@
+// LazyDataFrame::explain — render the (un-optimised) logical plan to a PNG
+// via Graphviz. We emit a .dot file describing the DAG and shell out to the
+// `dot` CLI to rasterise it. Edges point from child (input) to parent
+// (operation) so the bottom-up data flow reads naturally on the page.
+//
+// Note: explain() inspects the plan as the user built it, NOT after
+// optimization. To see optimizer effects, call collect() and inspect the
+// produced output, or temporarily print the plan post-optimize() in the
+// compiler.
+
 #include "../LazyDataFrame.h"
 #include <fstream>
 #include <iostream>
